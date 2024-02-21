@@ -1,41 +1,25 @@
 import java.io.*;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
 
 public class FileManager {
     private static final String CONTADOR_ARQUIVOS_PATH = "C:\\Users\\bruno\\IdeaProjects\\registration-system\\src\\files\\forms\\contador.txt";
 
-    public static void toManage(File formulario, User user, Scanner sc) {
-        List<String> listaRespostas = new ArrayList<String>();
-        try (FileReader fr = new FileReader(formulario); BufferedReader br = new BufferedReader(fr)) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                System.out.println(linha);
-                String resposta = sc.nextLine();
-                listaRespostas.add(resposta);
-            }
-            configureUser(user, listaRespostas);
-            createFile(formulario, user);
-            System.out.println(user.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void createFile(File formulario, User user) {
-        int fileCounter = lerContadorArquivos();
+    public static void createFile(Path formulario, User user) {
+        int fileCounter = readFileCounter() ;
         String userName = user.getName();
         String fileName = (fileCounter + 1) + "-" + userName.replaceAll("\\s", "").toUpperCase();
-        File newFile = new File("C:\\Users\\bruno\\IdeaProjects\\registration-system\\src\\files\\users\\" + fileName + ".txt");
-        try (FileWriter fw = new FileWriter(newFile)) {
-            fw.write("1 - " + user.getName());
-            fw.write("\n2 - " + user.getEmail());
-            fw.write("\n3 - " + user.getAge());
-            fw.write("\n4 - " + user.getHeight());
+        Path newPath = Paths.get("C:\\Users\\bruno\\IdeaProjects\\registration-system\\src\\files\\users\\" + fileName + ".txt");
+        try (BufferedWriter bw = Files.newBufferedWriter(newPath)) {
+            bw.write(user.getName());
+            bw.write("\n"+user.getEmail());
+            bw.write("\n"+user.getAge());
+            bw.write("\n"+user.getHeight());
 
             fileCounter++;
-            escreverContadorArquivos(fileCounter);
+            writeFileCounter(fileCounter);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,7 +37,7 @@ public class FileManager {
         }
     }
 
-    private static int lerContadorArquivos() {
+    private static int readFileCounter() {
         try (BufferedReader br = new BufferedReader(new FileReader(CONTADOR_ARQUIVOS_PATH))) {
             String linha = br.readLine();
             if (linha != null && !linha.isEmpty()) {
@@ -65,7 +49,7 @@ public class FileManager {
         return 0; // Valor padrão se não conseguir ler o contador
     }
 
-    private static void escreverContadorArquivos(int contador) {
+    private static void writeFileCounter(int contador) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONTADOR_ARQUIVOS_PATH))) {
             bw.write(Integer.toString(contador));
         } catch (IOException e) {
