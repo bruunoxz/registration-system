@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class UserManager {
 
     private static final Path formulario = Paths.get("C:\\Users\\bruno\\IdeaProjects\\registration-system\\src\\files\\forms\\formulario.txt");
-
+    private static final Path usersDirectory = Paths.get("C:\\Users\\bruno\\IdeaProjects\\registration-system\\src\\files\\users");
 
     private static void createUser() {
         User user = new User();
@@ -32,7 +32,6 @@ public class UserManager {
     }
 
     private static void listUsers() {
-        Path usersDirectory = Paths.get("C:\\Users\\bruno\\IdeaProjects\\registration-system\\src\\files\\users");
         int counter = 1;
 
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(usersDirectory)) {
@@ -43,6 +42,29 @@ public class UserManager {
                     counter++;
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void findByName(String name){
+        try {
+            Files.walk(Paths.get(usersDirectory.toString()))
+                    .filter(Files::isRegularFile)
+                    .forEach(arquivo -> {
+                        try (BufferedReader br = Files.newBufferedReader(arquivo)) {
+                            String linha;
+                            while ((linha = br.readLine()) != null) {
+                                if (linha.contains(name)) {
+                                    System.out.println(linha);
+                                    System.out.println();
+                                    break;
+                                }
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,6 +123,7 @@ public class UserManager {
         System.out.println("2 - Listar todos os usuários cadastrados");
         System.out.println("3 - Cadastrar nova pergunta no formulário");
         System.out.println("4 - Deletar pergunta no formulário");
+        System.out.println("5 - Pesquisar usuário por nome");
         int option = sc.nextInt();
         switch (option) {
             case 1:
@@ -119,6 +142,12 @@ public class UserManager {
                 System.out.println("Digite o número da questão:");
                 int index = sc.nextInt();
                 deleteQuestion(index);
+                break;
+            case 5:
+                sc.nextLine();
+                System.out.println("Digite o nome que deseja buscar:");
+                String name = sc.nextLine();
+                findByName(name);
                 break;
         }
     }

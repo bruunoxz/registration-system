@@ -46,7 +46,7 @@ public class FileManager {
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
-        return 0; // Valor padrão se não conseguir ler o contador
+        return 0;
     }
 
     private static void writeFileCounter(int contador) {
